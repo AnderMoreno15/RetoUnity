@@ -71,3 +71,27 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Unnecessary assets
+.vscode/*
+Assets/InputSystem_Actions.inputactions
+Assets/InputSystem_Actions.inputactions.meta
+Assets/RPG_FPS_game_assets_industrial.meta
+Assets/RPG_FPS_game_assets_industrial/
+Assets/Readme.asset
+Assets/Readme.asset.meta
+Assets/Samples.meta
+Assets/Samples/*
+Assets/Scenes.meta
+Assets/Settings.meta
+Assets/Settings/*
+Assets/Soldier.meta
+Assets/Soldier/*
+Assets/TutorialInfo.meta
+Assets/TutorialInfo/*
+Packages/*
+ProjectSettings/*
+Assets/New Terrain.asset
+Assets/New Terrain.asset.meta
+Assets/PAIAGaming/Environments.meta
+Assets/PAIAGaming/Environments/
