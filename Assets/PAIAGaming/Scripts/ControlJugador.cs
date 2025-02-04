@@ -2,30 +2,21 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private Animator animator; // Referencia al componente Animator
-    private Rigidbody rb;      // Referencia al componente Rigidbody
+    private Animator animator;
+    private Rigidbody rb;
 
     [Header("Movement Settings")]
-    public float moveSpeed = 5.0f;        // Velocidad de movimiento
-    public float rotationSpeed = 200.0f; // Velocidad de rotación
-
-    [Header("Jump Settings")]
-    public float jumpForce = 5.0f;       // Fuerza del salto
-    private bool isGrounded = true;      // Verifica si el jugador está en el suelo
-
-    [Header("Look Settings")]
-    public float lookSpeedX = 2.0f; // Velocidad de rotación en el eje X
-    public float lookSpeedY = 2.0f; // Velocidad de rotación en el eje Y
-    private float rotationX = 0f;    // Rotación en el eje X
-    private float rotationY = 0f;    // Rotación en el eje Y
+    public float walkSpeed = 5.0f;   // Velocidad al caminar
+    public float runSpeed = 8.0f;    // Velocidad al correr
+    public float rotationSpeed = 200.0f;
 
     void Start()
     {
-        // Ocultar y bloquear el cursor
+        // Bloquea el cursor en el centro de la pantalla
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // Obtener referencias a componentes necesarios
+        // Obtiene referencias a los componentes necesarios
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
     }
@@ -33,68 +24,46 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         HandleMovement();
-        HandleRotation();
-        HandleJump();
+        HandleShooting();
     }
 
     private void HandleMovement()
     {
-        // Obtener entradas de movimiento
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
-        // Crear vector de movimiento en el espacio local
-        Vector3 move = new Vector3(horizontal, 0.0f, vertical).normalized;
+        // Determina la dirección del movimiento
+        Vector3 moveDirection = (transform.forward * vertical + transform.right * horizontal).normalized;
 
-        if (move.magnitude > 0) // Si el jugador se está moviendo
+        // Verifica si el personaje está corriendo (Shift presionado)
+        bool isRunning = Input.GetKey(KeyCode.LeftShift) && moveDirection.magnitude > 0;
+        bool isWalking = !isRunning && moveDirection.magnitude > 0;
+
+        // Ajustar la velocidad según el estado
+        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+
+        // Mueve al personaje con Rigidbody
+        Vector3 targetPosition = rb.position + moveDirection * currentSpeed * Time.deltaTime;
+        targetPosition.y = rb.position.y; // Evita cambios de altura inesperados
+        rb.MovePosition(targetPosition);
+
+        // Control de animaciones
+        if (animator != null)
         {
-            // Aplicar movimiento
-            transform.Translate(move * moveSpeed * Time.deltaTime, Space.Self);
-
-            // Actualizar animación
-            animator.SetBool("isRunning", true);
-        }
-        else
-        {
-            // Detener animación si no se mueve
-            animator.SetBool("isRunning", false);
-        }
-    }
-
-    private void HandleRotation()
-    {
-        // Obtener las entradas del mouse para rotación
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y");
-
-        // Ajustar la rotación en el eje Y (y rotar el jugador)
-        rotationY += mouseX * lookSpeedX;
-
-        // Limitar la rotación en el eje X (mirar arriba y abajo)
-        rotationX -= mouseY * lookSpeedY;
-        rotationX = Mathf.Clamp(rotationX, -80f, 80f); // Limitar para no volverse demasiado loco
-
-        // Aplicar la rotación
-        transform.rotation = Quaternion.Euler(rotationX, rotationY, 0);
-    }
-
-    private void HandleJump()
-    {
-        // Salto si el jugador está en el suelo
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            animator.SetTrigger("Jump"); // Disparar animación de salto
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false; // Está en el aire
+            animator.SetBool("isRunning", isRunning);
+            animator.SetBool("isWalking", isWalking);
         }
     }
 
-    // Verifica si el jugador está tocando el suelo
-    private void OnCollisionEnter(Collision collision)
+    private void HandleShooting()
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        // Detectar si el botón izquierdo del ratón está presionado
+        bool isShooting = Input.GetMouseButton(0); // Mouse0 = Clic izquierdo
+
+        // Activar animación de disparo
+        if (animator != null)
         {
-            isGrounded = true;
+            animator.SetBool("isShooting", isShooting);
         }
     }
 }
