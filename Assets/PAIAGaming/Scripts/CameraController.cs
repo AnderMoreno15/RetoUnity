@@ -31,7 +31,7 @@ public class CameraController : MonoBehaviour
 
         // Rotación de la cámara (solo en X - arriba/abajo)
         rotationX -= mouseY;
-        rotationX = Mathf.Clamp(rotationX, -30f, 20f); // Limitar la inclinación de la cámara
+        rotationX = Mathf.Clamp(rotationX, -50f, 20f); // Limitar la inclinación de la cámara
 
         // Aplicar la rotación al Camera Pivot
         cameraPivot.localRotation = Quaternion.Euler(rotationX, 0, 0);
